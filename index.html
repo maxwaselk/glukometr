@@ -3,54 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Glukozy</title>
+    <title>Monitorowanie Glukozy</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Monitor Poziomu Glukozy</h1>
+    <h1>Monitorowanie poziomu glukozy</h1>
 
     <form id="glucose-form">
-        <label for="date">Data:</label>
+        <label for="date">Data pomiaru:</label>
         <input type="date" id="date" required>
-        
-        <label for="time">Czas:</label>
+        <label for="time">Godzina pomiaru:</label>
         <input type="time" id="time" required>
-        
-        <label for="glucose">Poziom glukozy (mg/dL):</label>
-        <input type="number" id="glucose" required>
-        
-        <label for="measurement-type">Typ pomiaru:</label>
-        <select id="measurement-type" required>
+        <label for="glucose">Poziom glukozy:</label>
+        <input type="number" id="glucose" placeholder="Poziom glukozy (mg/dL)" required>
+        <label for="glucose-timing">Moment badania:</label>
+        <select id="glucose-timing" required>
+            <option value="" disabled selected>Wybierz moment badania</option>
             <option value="na czczo">Na czczo</option>
             <option value="1 godzina po posiłku">1 godzina po posiłku</option>
             <option value="2 godziny po posiłku">2 godziny po posiłku</option>
             <option value="wieczorem">Wieczorem</option>
-            <option value="w nocy (3-4)">W nocy (3-4)</option>
+            <option value="noc (3-4)">Noc (3-4)</option>
         </select>
-        
-        <button type="submit">Dodaj wynik</button>
-        <button type="button" id="print-button">Drukuj wyniki</button>
+        <button type="submit">Zapisz wynik</button>
     </form>
 
-    <h2>Wyniki pomiarów</h2>
+    <button onclick="printResults()" class="no-print">Drukuj wyniki</button>
+
     <table id="glucose-table">
         <thead>
             <tr>
                 <th>Data</th>
                 <th>Czas</th>
-                <th>Poziom glukozy (mg/dL)</th>
-                <th>Typ pomiaru</th>
-                <th>Ważność</th>
-                <th>Akcje</th>
+                <th>Glukoza</th>
+                <th>Moment</th>
+                <th>Status</th>
+                <th>Akcja</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Wyniki będą dodawane tutaj -->
+            <!-- Tutaj będą dodawane wyniki pomiarów -->
         </tbody>
     </table>
 
-    <h2>Wykres poziomu glukozy</h2>
     <canvas id="glucose-chart" width="400" height="200"></canvas>
 
     <script src="script.js"></script>
