@@ -3,31 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker Glukozy</title>
     <link rel="stylesheet" href="styles.css">
-    <title>Pomiar Glukozy</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Pomiar Glukozy</h1>
+        <h1>Tracker Glukozy</h1>
         <form id="glucose-form">
-            <label for="date">Data:</label>
             <input type="date" id="date" required>
-            <label for="time">Czas:</label>
             <input type="time" id="time" required>
-            <label for="glucose">Poziom glukozy (mg/dL):</label>
-            <input type="number" id="glucose" required>
-            <label for="glucose-timing">Moment badania:</label>
-            <select id="glucose-timing" required>
-                <option value="na czczo">Na czczo</option>
+            <input type="number" id="glucose" placeholder="Poziom glukozy (mg/dL)" required>
+            <select id="glucose-timing">
+                <option value="Na czczo">Na czczo</option>
                 <option value="1 godzina po posiłku">1 godzina po posiłku</option>
                 <option value="2 godziny po posiłku">2 godziny po posiłku</option>
-                <option value="wieczorem">Wieczorem</option>
-                <option value="w nocy">W nocy</option>
+                <option value="Wieczorem">Wieczorem</option>
+                <option value="Noc (2-3)">Noc (2-3)</option>
             </select>
-            <button type="submit">Zapisz wynik</button>
+            <button type="submit">Dodaj wynik</button>
         </form>
 
-        <h2>Wyniki pomiarów</h2>
         <table id="results-table">
             <thead>
                 <tr>
@@ -40,12 +36,10 @@
             </thead>
             <tbody></tbody>
         </table>
-
+        
         <button id="print-button">Drukuj wyniki</button>
-        <canvas id="glucose-chart" width="400" height="200"></canvas>
+        <canvas id="glucose-chart"></canvas>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
