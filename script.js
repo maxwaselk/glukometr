@@ -84,6 +84,7 @@ function addResultToTable(glucose, timing, validity, date, time) {
     row.innerHTML = `
         <td>${date} ${time}</td>
         <td>${glucose} mg/dL</td>
+        <td>${timing}</td>
         <td>${validity}</td>
         <td>
             <button class="action-button delete-button" onclick="deleteResult(${glucoseData.length - 1})">Usuń</button>
@@ -102,6 +103,7 @@ function updateResultsTable() {
         row.innerHTML = `
             <td>${item.date} ${item.time}</td>
             <td>${item.glucose} mg/dL</td>
+            <td>${item.timing}</td>
             <td>${item.validity}</td>
             <td>
                 <button class="action-button delete-button" onclick="deleteResult(${index})">Usuń</button>
