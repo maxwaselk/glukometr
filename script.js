@@ -116,7 +116,14 @@ function updateStatistics() {
         return;
     }
 
-    const glucoseLevels = glucoseData.map(item => parseFloat(item.glucose));
+    const glucoseLevels = glucoseData.map(item => parseFloat(item.glucose)).filter(n => !isNaN(n));
+    if (glucoseLevels.length === 0) {
+        document.getElementById('average-glucose').textContent = "Średni poziom glukozy: -- mg/dL";
+        document.getElementById('min-glucose').textContent = "Minimalny poziom glukozy: -- mg/dL";
+        document.getElementById('max-glucose').textContent = "Maksymalny poziom glukozy: -- mg/dL";
+        return;
+    }
+
     const average = (glucoseLevels.reduce((a, b) => a + b, 0) / glucoseLevels.length).toFixed(2);
     const min = Math.min(...glucoseLevels).toFixed(2);
     const max = Math.max(...glucoseLevels).toFixed(2);
@@ -285,7 +292,23 @@ document.getElementById('glucose-form').addEventListener('submit', function(even
 
 // Funkcja ładowania danych z localStorage
 function loadFromLocalStorage() {
-    glucoseData = JSON.parse(localStorage.getItem('glucoseData')) || [];
+    const data = localStorage.getItem('glucoseData');
+    if (data) {
+        try {
+            glucoseData = JSON.parse(data).map(item => ({
+                glucose: parseFloat(item.glucose),
+                timing: item.timing,
+                date: item.date,
+                time: item.time,
+                validity: item.validity
+            }));
+        } catch (e) {
+            console.error("Błąd podczas parsowania danych z localStorage:", e);
+            glucoseData = [];
+        }
+    } else {
+        glucoseData = [];
+    }
     updateResultsTable();
 }
 
