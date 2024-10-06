@@ -11,7 +11,7 @@ function initializeChart() {
             labels: labels,
             datasets: [{
                 label: 'Poziom glukozy (mg/dL)',
-                data: glucoseData,
+                data: glucoseData.map(data => data.glucose),
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 2,
@@ -41,28 +41,28 @@ function initializeChart() {
     });
 }
 
-function addResultToTable(glucose, timing, validity) {
+function addResultToTable(glucose, timing, validity, date) {
     const tableBody = document.querySelector('#results-table tbody');
     const row = document.createElement('tr');
 
     row.innerHTML = `
         <td>${glucose}</td>
-        <td>${timing}</td>
+        <td>${date} (${timing})</td>
         <td>${validity}</td>
         <td><button class="action-button delete-button">Usuń</button></td>
     `;
 
     row.querySelector('.delete-button').addEventListener('click', function () {
         tableBody.removeChild(row);
-        removeResult(glucose, timing);
+        removeResult(glucose, timing, date);
         updateChart();
     });
 
     tableBody.appendChild(row);
 }
 
-function removeResult(glucose, timing) {
-    const index = glucoseData.findIndex(data => data.glucose === glucose && data.timing === timing);
+function removeResult(glucose, timing, date) {
+    const index = glucoseData.findIndex(data => data.glucose === glucose && data.timing === timing && data.date === date);
     if (index !== -1) {
         glucoseData.splice(index, 1);
         labels.splice(index, 1);
@@ -86,8 +86,8 @@ function loadFromLocalStorage() {
     if (storedData) {
         glucoseData = storedData;
         glucoseData.forEach(data => {
-            addResultToTable(data.glucose, data.timing, data.validity);
-            labels.push(new Date().toLocaleString()); // Dodaj daty do etykiet
+            addResultToTable(data.glucose, data.timing, data.validity, data.date);
+            labels.push(new Date(data.date).toLocaleString()); // Dodaj daty do etykiet
         });
         updateChart();
     }
@@ -120,7 +120,7 @@ function checkGlucoseValidity(glucose, timing) {
             message = "Prawidłowy";
         }
     } else if (timing === "noc (3-4)") {
-        if (glucose >= 60) {
+        if (glucose > 60) {
             isValid = true;
             message = "Prawidłowy";
         }
@@ -135,20 +135,23 @@ document.getElementById('glucose-form').addEventListener('submit', function (eve
 
     const glucoseLevel = document.getElementById('glucose-level').value;
     const timing = document.getElementById('timing').value;
+    const date = document.getElementById('measurement-date').value;
 
     const validity = checkGlucoseValidity(glucoseLevel, timing);
-    addResultToTable(glucoseLevel, timing, validity);
+    addResultToTable(glucoseLevel, timing, validity, date);
 
     glucoseData.push({
         glucose: parseFloat(glucoseLevel),
         timing: timing,
-        validity: validity
+        validity: validity,
+        date: date
     });
-    labels.push(new Date().toLocaleString());
+    labels.push(date);
     saveToLocalStorage();
     updateChart();
 
     document.getElementById('glucose-level').value = ''; // Resetowanie pola
+    document.getElementById('measurement-date').value = ''; // Resetowanie pola
     document.getElementById('validation-message').textContent = ''; // Resetowanie komunikatu
 });
 
