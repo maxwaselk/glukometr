@@ -139,7 +139,7 @@ document.getElementById('glucose-table').addEventListener('click', function(even
 document.getElementById('print-button').addEventListener('click', function() {
     const printWindow = window.open('', '', 'height=600,width=800');
     printWindow.document.write('<html><head><title>Wyniki pomiarów glukozy</title>');
-    printWindow.document.write('<link rel="stylesheet" href="styles.css">');
+    printWindow.document.write('<link rel="stylesheet" href="styles.css">'); // Dodaj własny styl
     printWindow.document.write('</head><body>');
     printWindow.document.write('<h1>Wyniki pomiarów glukozy</h1>');
     printWindow.document.write('<table border="1" style="width:100%; border-collapse:collapse;">');
