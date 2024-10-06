@@ -39,8 +39,54 @@ function initializeChart() {
     });
 }
 
+// Funkcja sprawdzająca prawidłowość wyniku glukozy
+function checkGlucoseValidity(glucose, timing) {
+    glucose = parseFloat(glucose);
+    let isValid = false;
+    let message = "Nieprawidłowy";
+
+    if (timing === "Na czczo") {
+        if (glucose >= 60 && glucose <= 90) {
+            isValid = true;
+            message = "Prawidłowy";
+        }
+    } else if (timing === "1 godzina po posiłku") {
+        if (glucose < 140) {
+            isValid = true;
+            message = "Prawidłowy";
+        }
+    } else if (timing === "2 godziny po posiłku") {
+        if (glucose < 120) {
+            isValid = true;
+            message = "Prawidłowy";
+        }
+    } else if (timing === "Wieczorem") {
+        if (glucose >= 60 && glucose <= 105) {
+            isValid = true;
+            message = "Prawidłowy";
+        }
+    } else if (timing === "Noc (3-4)") {
+        if (glucose > 60) {
+            isValid = true;
+            message = "Prawidłowy";
+        }
+    }
+
+    return { isValid, message };
+}
+
 // Dodawanie wyniku do tabeli i wykresu
 function addResultToTable(date, time, glucose, timing) {
+    const validationMessageElement = document.getElementById('validation-message');
+    const { isValid, message } = checkGlucoseValidity(glucose, timing);
+    
+    if (!isValid) {
+        validationMessageElement.textContent = message;
+        return;
+    } else {
+        validationMessageElement.textContent = ''; // Wyczyszczenie komunikatu o błędzie
+    }
+
     const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
     savedResults.push({ date, time, glucose, timing });
     localStorage.setItem('glucoseResults', JSON.stringify(savedResults));
@@ -150,12 +196,14 @@ function printResults() {
         }
     });
 
-    // Drukowanie
+    // Wydrukuj zawartość
     window.print();
-    document.body.innerHTML = originalContents; // Przywróć oryginalną zawartość
+
+    // Przywróć oryginalną zawartość
+    document.body.innerHTML = originalContents;
 }
 
-// Funkcja generująca wiersze tabeli do druku
+// Generuj wiersze tabeli do wydruku
 function generateTableRows() {
     const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
     return savedResults.map(result => `
@@ -168,10 +216,9 @@ function generateTableRows() {
     `).join('');
 }
 
-// Obsługa formularza
+// Obsługa zdarzenia przesyłania formularza
 document.getElementById('glucose-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Zapobiega przeładowaniu strony
-
+    event.preventDefault(); // Zapobiegaj przeładowaniu strony
     const date = document.getElementById('date').value;
     const time = document.getElementById('time').value;
     const glucose = document.getElementById('glucose').value;
