@@ -1,6 +1,6 @@
-// Inicjalizacja wykresu Chart.js
 let glucoseChart;
 
+// Funkcja do inicjalizacji wykresu
 function initializeChart() {
     const ctx = document.getElementById('glucose-chart').getContext('2d');
     glucoseChart = new Chart(ctx, {
@@ -23,6 +23,16 @@ function initializeChart() {
             scales: {
                 y: {
                     beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'mg/dL'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Data i Czas'
+                    }
                 }
             }
         }
@@ -88,10 +98,12 @@ function checkGlucoseValidity(glucose, timing) {
 // Funkcja do usuwania wyniku
 function deleteResult(button) {
     const row = button.parentNode.parentNode;
+    const date = row.children[0].textContent;
+    const time = row.children[1].textContent;
     row.remove();
 
     // Zaktualizuj dane wykresu
-    const glucoseIndex = glucoseChart.data.labels.indexOf(`${row.children[0].textContent} ${row.children[1].textContent}`);
+    const glucoseIndex = glucoseChart.data.labels.indexOf(`${date} ${time}`);
     if (glucoseIndex > -1) {
         glucoseChart.data.labels.splice(glucoseIndex, 1);
         glucoseChart.data.datasets[0].data.splice(glucoseIndex, 1);
@@ -99,7 +111,7 @@ function deleteResult(button) {
     }
 
     // Usunięcie wyniku z LocalStorage
-    removeResultFromLocalStorage(`${row.children[0].textContent} ${row.children[1].textContent}`);
+    removeResultFromLocalStorage(`${date} ${time}`);
 }
 
 // Funkcja do usuwania wyniku z LocalStorage
@@ -134,4 +146,19 @@ function printResults() {
 }
 
 // Inicjalizacja aplikacji
-document.addEventListener('DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeChart();
+    loadResults(); // Ładowanie zapisanych wyników z LocalStorage
+});
+
+// Dodanie nasłuchiwacza zdarzeń do formularza
+document.getElementById('glucose-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Zatrzymaj domyślne działanie formularza
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    const glucose = document.getElementById('glucose').value;
+    const timing = document.getElementById('glucose-timing').value;
+
+    addResultToTable(date, time, glucose, timing); // Dodaj wynik do tabeli
+    this.reset(); // Zresetuj formularz
+});
