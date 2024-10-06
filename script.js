@@ -7,10 +7,10 @@ function initializeChart() {
     glucoseChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: glucoseData.map(entry => `${entry.date} ${entry.time}`), // Daty i czasy pomiarów
+            labels: glucoseData.map(entry => `${entry.date} ${entry.time}`),
             datasets: [{
                 label: 'Poziom glukozy (mg/dL)',
-                data: glucoseData.map(entry => entry.glucose), // Poziomy glukozy
+                data: glucoseData.map(entry => entry.glucose),
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 2,
@@ -41,17 +41,18 @@ function initializeChart() {
 }
 
 // Funkcja dodawania wyniku do tabeli
-function addResultToTable(date, time, glucose, measurementType) {
+function addResultToTable(date, time, glucose, measurementType, index) {
     const tableBody = document.querySelector('#glucose-table tbody');
     const row = document.createElement('tr');
     const glucoseValidity = checkGlucoseValidity(glucose);
-    
+
     row.innerHTML = `
         <td>${date}</td>
         <td>${time}</td>
         <td>${glucose} mg/dL</td>
         <td>${measurementType}</td>
         <td class="${glucoseValidity.isValid ? 'good' : 'bad'}">${glucoseValidity.message}</td>
+        <td><button class="delete-button" data-index="${index}">Usuń</button></td>
     `;
     tableBody.appendChild(row);
 }
@@ -75,8 +76,7 @@ function checkGlucoseValidity(glucose) {
 }
 
 // Funkcja zapisywania wyniku w LocalStorage
-function saveResult(date, time, glucose, measurementType) {
-    glucoseData.push({ date, time, glucose, measurementType });
+function saveResult() {
     localStorage.setItem('glucoseResults', JSON.stringify(glucoseData));
 }
 
@@ -88,19 +88,106 @@ document.getElementById('glucose-form').addEventListener('submit', function(even
     const glucose = document.getElementById('glucose').value;
     const measurementType = document.getElementById('measurement-type').value;
 
-    addResultToTable(date, time, glucose, measurementType);
-    saveResult(date, time, glucose, measurementType);
+    const index = glucoseData.length; // Indeks do dodawania do tabeli
+    addResultToTable(date, time, glucose, measurementType, index);
+    glucoseData.push({ date, time, glucose, measurementType });
+    saveResult();
 
-    // Resetowanie formularza
     this.reset();
-    // Aktualizacja wykresu
     glucoseChart.data.labels.push(`${date} ${time}`);
     glucoseChart.data.datasets[0].data.push(glucose);
     glucoseChart.update();
 });
 
+// Funkcja do usuwania wyniku
+function deleteResult(index) {
+    glucoseData.splice(index, 1);
+    saveResult();
+    updateTable();
+    updateChart();
+}
+
+// Funkcja aktualizująca tabelę
+function updateTable() {
+    const tableBody = document.querySelector('#glucose-table tbody');
+    tableBody.innerHTML = ''; // Wyczyść tabelę
+    glucoseData.forEach((result, index) => addResultToTable(result.date, result.time, result.glucose, result.measurementType, index));
+}
+
+// Funkcja aktualizująca wykres
+function updateChart() {
+    glucoseChart.data.labels = glucoseData.map(entry => `${entry.date} ${entry.time}`);
+    glucoseChart.data.datasets[0].data = glucoseData.map(entry => entry.glucose);
+    glucoseChart.update();
+}
+
 // Ładowanie zapisanych wyników i konfiguracja nasłuchiwania zdarzeń po załadowaniu strony
 window.onload = function() {
-    glucoseData.forEach(result => addResultToTable(result.date, result.time, result.glucose, result.measurementType));
+    glucoseData.forEach((result, index) => addResultToTable(result.date, result.time, result.glucose, result.measurementType, index));
     initializeChart();
 };
+
+// Obsługa usuwania wyników
+document.getElementById('glucose-table').addEventListener('click', function(event) {
+    if (event.target.classList.contains('delete-button')) {
+        const index = event.target.getAttribute('data-index');
+        deleteResult(index);
+    }
+});
+
+// Funkcja do drukowania wyników
+document.getElementById('print-button').addEventListener('click', function() {
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>Wyniki pomiarów glukozy</title>');
+    printWindow.document.write('<link rel="stylesheet" href="styles.css">');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<h1>Wyniki pomiarów glukozy</h1>');
+    printWindow.document.write(document.getElementById('glucose-table').outerHTML);
+    printWindow.document.write('<h2>Wykres poziomu glukozy</h2>');
+    printWindow.document.write('<canvas id="print-chart"></canvas>');
+    printWindow.document.write('</body></html>');
+
+    printWindow.document.close();
+    printWindow.onload = function() {
+        const printCtx = printWindow.document.getElementById('print-chart').getContext('2d');
+        new Chart(printCtx, {
+            type: 'line',
+            data: {
+                labels: glucoseData.map(entry => `${entry.date} ${entry.time}`),
+                datasets: [{
+                    label: 'Poziom glukozy (mg/dL)',
+                    data: glucoseData.map(entry => entry.glucose),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Data i Czas'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Poziom glukozy (mg/dL)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    };
+
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 500);
+});
