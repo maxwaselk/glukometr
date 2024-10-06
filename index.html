@@ -4,63 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitorowanie Glukozy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="styles.css">
-    <!-- CryptoJS Library removed as encryption is no longer used -->
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --background-color: #f0f4f8;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 2em;
+            margin-bottom: 1em;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select, button {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: var(--card-background);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .good {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .bad {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Monitorowanie poziomu glukozy</h1>
-            <button id="theme-toggle" aria-label="Przełącz tryb jasny/ciemny">🌙</button>
-        </header>
+        <h1>Monitorowanie poziomu glukozy</h1>
 
         <div class="card">
-            <form id="glucose-form" novalidate>
+            <form id="glucose-form">
                 <div class="form-group">
                     <label for="date">Data pomiaru:</label>
-                    <input type="date" id="date" required aria-required="true">
-                    <span class="error-message" id="date-error">Proszę wybrać datę.</span>
+                    <input type="date" id="date" required>
                 </div>
                 <div class="form-group">
                     <label for="time">Godzina pomiaru:</label>
-                    <input type="time" id="time" required aria-required="true">
-                    <span class="error-message" id="time-error">Proszę wybrać godzinę.</span>
+                    <input type="time" id="time" required>
                 </div>
                 <div class="form-group">
                     <label for="glucose">Poziom glukozy:</label>
-                    <input type="number" id="glucose" placeholder="Poziom glukozy (mg/dL)" required aria-required="true" min="40" max="400">
-                    <span class="error-message" id="glucose-error">Proszę wprowadzić prawidłowy poziom glukozy.</span>
-                </div>
-                <div class="form-group">
-                    <label for="glucose-timing">Moment badania:</label>
-                    <select id="glucose-timing" required aria-required="true">
-                        <option value="" disabled selected>Wybierz moment badania</option>
-                        <option value="na czczo">Na czczo</option>
-                        <option value="1 godzina po posiłku">1 godzina po posiłku</option>
-                        <option value="2 godziny po posiłku">2 godziny po posiłku</option>
-                        <option value="wieczorem">Wieczorem</option>
-                        <option value="noc (3-4)">Noc (3-4)</option>
-                    </select>
-                    <span class="error-message" id="timing-error">Proszę wybrać moment badania.</span>
-                </div>
-                <div class="form-group">
-                    <label for="notes">Notatki:</label>
-                    <textarea id="notes" placeholder="Dodaj notatki (opcjonalnie)" rows="3"></textarea>
+                    <input type="number" id="glucose" placeholder="Poziom glukozy (mg/dL)" required>
                 </div>
                 <button type="submit">Zapisz wynik</button>
             </form>
-        </div>
-
-        <div class="chart-container">
-            <canvas id="glucose-chart"></canvas>
-        </div>
-
-        <div class="actions">
-            <button onclick="printResults()">Drukuj wyniki</button>
-            <button onclick="exportToCSV()">Eksportuj do CSV</button>
-            <button onclick="downloadData()">Pobierz dane</button>
         </div>
 
         <table id="glucose-table">
@@ -69,10 +140,7 @@
                     <th>Data</th>
                     <th>Czas</th>
                     <th>Glukoza</th>
-                    <th>Moment</th>
-                    <th>Notatki</th>
                     <th>Status</th>
-                    <th>Akcja</th>
                 </tr>
             </thead>
             <tbody>
@@ -80,29 +148,110 @@
             </tbody>
         </table>
 
-        <!-- Sekcja Ustawień Personalizacji -->
-        <div class="settings-card">
-            <h2>Ustawienia</h2>
-            <div class="form-group">
-                <label for="font-select">Wybierz czcionkę:</label>
-                <select id="font-select">
-                    <option value="Roboto">Roboto</option>
-                    <option value="Arial">Arial</option>
-                    <option value="Verdana">Verdana</option>
-                    <option value="Tahoma">Tahoma</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="color-picker">Wybierz kolor motywu:</label>
-                <input type="color" id="color-picker" value="#4CAF50">
-            </div>
-            <button onclick="applySettings()">Zastosuj ustawienia</button>
-        </div>
+        <canvas id="glucose-chart" width="400" height="200"></canvas>
     </div>
 
-    <!-- Import bibliotek zewnętrznych -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Funkcja dodająca wynik do tabeli
+        function addResultToTable(date, time, glucose) {
+            const tableBody = document.querySelector('#glucose-table tbody');
+            const row = document.createElement('tr');
+            const glucoseStatus = checkGlucoseStatus(glucose);
+            
+            row.innerHTML = `
+                <td>${date}</td>
+                <td>${time}</td>
+                <td>${glucose} mg/dL</td>
+                <td class="${glucoseStatus.isValid ? 'good' : 'bad'}">${glucoseStatus.message}</td>
+            `;
+            tableBody.appendChild(row);
+        }
+
+        // Funkcja sprawdzająca prawidłowość wyniku glukozy
+        function checkGlucoseStatus(glucose) {
+            glucose = parseFloat(glucose);
+            let isValid = glucose >= 70 && glucose <= 120;
+            let message = isValid ? "Prawidłowy" : "Nieprawidłowy";
+            return { isValid, message };
+        }
+
+        // Funkcja zapisywania wyniku w LocalStorage
+        function saveResult(date, time, glucose) {
+            const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
+            savedResults.push({ date, time, glucose });
+            localStorage.setItem('glucoseResults', JSON.stringify(savedResults));
+            updateChart();
+        }
+
+        // Funkcja ładowania zapisanych wyników
+        function loadResults() {
+            const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
+            savedResults.forEach(result => addResultToTable(result.date, result.time, result.glucose));
+            updateChart();
+        }
+
+        // Obsługa formularza
+        document.getElementById('glucose-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const glucose = document.getElementById('glucose').value;
+
+            addResultToTable(date, time, glucose);
+            saveResult(date, time, glucose);
+
+            // Czyszczenie formularza
+            document.getElementById('date').value = '';
+            document.getElementById('time').value = '';
+            document.getElementById('glucose').value = '';
+        });
+
+        // Inicjalizacja wykresu
+        const ctx = document.getElementById('glucose-chart').getContext('2d');
+        let glucoseChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Daty pomiarów
+                datasets: [{
+                    label: 'Poziom glukozy (mg/dL)',
+                    data: [], // Wyniki glukozy
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        min: 50,
+                        max: 200
+                    }
+                }
+            }
+        });
+
+        // Aktualizacja wykresu
+        function updateChart() {
+            const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
+            const dates = savedResults.map(result => new Date(result.date));
+            const glucoseLevels = savedResults.map(result => result.glucose);
+
+            glucoseChart.data.labels = dates;
+            glucoseChart.data.datasets[0].data = glucoseLevels;
+            glucoseChart.update();
+        }
+
+        // Ładowanie wyników przy załadowaniu strony
+        window.onload = loadResults;
+    </script>
 </body>
 </html>
