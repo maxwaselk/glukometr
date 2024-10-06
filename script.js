@@ -76,23 +76,6 @@ function checkGlucoseValidity(glucose, timing) {
     return message;
 }
 
-// Funkcja dodająca wynik do tabeli
-function addResultToTable(glucose, timing, validity, date, time) {
-    const tableBody = document.querySelector('#results-table tbody');
-    const row = document.createElement('tr');
-
-    row.innerHTML = `
-        <td>${date} ${time}</td>
-        <td>${glucose} mg/dL</td>
-        <td>${timing}</td>
-        <td>${validity}</td>
-        <td>
-            <button class="action-button delete-button" onclick="deleteResult(${glucoseData.length - 1})">Usuń</button>
-        </td>
-    `;
-    tableBody.appendChild(row);
-}
-
 // Funkcja aktualizująca tabelę wyników
 function updateResultsTable() {
     const tableBody = document.querySelector('#results-table tbody');
