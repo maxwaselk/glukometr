@@ -1,19 +1,23 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #333;
-    color: #fff;
+    background-color: #121212; /* Ciemne tło */
+    color: #ffffff; /* Białe teksty */
+    margin: 0;
+    padding: 0;
 }
 
 .container {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 20px auto;
     padding: 20px;
-    background-color: #444;
-    border-radius: 8px;
+    background-color: #1e1e1e; /* Lekko jaśniejszy ciemny kolor tła */
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 h1 {
     text-align: center;
+    margin-bottom: 20px;
 }
 
 form {
@@ -22,35 +26,66 @@ form {
 
 input, select, button {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin: 10px 0;
     border: none;
     border-radius: 5px;
+    transition: background-color 0.3s; /* Animacja zmiany koloru */
+}
+
+input:focus, select:focus {
+    outline: none;
+    background-color: #2a2a2a; /* Kolor tła przy focusie */
 }
 
 button {
-    background-color: #28a745;
+    background-color: #28a745; /* Zielony kolor przycisku */
     color: white;
     cursor: pointer;
+    font-weight: bold;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #218838; /* Ciemniejszy zielony przy hoverze */
+    transform: scale(1.05); /* Powiększenie przycisku przy hoverze */
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
 }
 
 th, td {
-    padding: 10px;
+    padding: 12px;
     text-align: center;
-    border: 1px solid #ddd;
+    border: 1px solid #444; /* Kolor obramowania */
+}
+
+th {
+    background-color: #2a2a2a; /* Ciemniejsze tło nagłówków */
+}
+
+tr:hover {
+    background-color: #333; /* Zmiana koloru wiersza na hover */
 }
 
 .validation-message {
-    color: #ff0000;
+    color: #ff4757; /* Czerwony kolor dla komunikatów o błędach */
     font-weight: bold;
     margin: 10px 0;
+    text-align: center;
+}
+
+canvas {
+    margin-top: 20px; /* Odstęp nad wykresem */
+}
+
+/* Styl dla przycisku drukowania */
+#print-button {
+    background-color: #007bff; /* Niebieski kolor dla przycisku */
+}
+
+#print-button:hover {
+    background-color: #0056b3; /* Ciemniejszy niebieski przy hoverze */
 }
