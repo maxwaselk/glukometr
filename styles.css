@@ -3,62 +3,60 @@
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
     background-color: #121212;
-    color: #ffffff;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
     margin: 0;
-    padding: 0;
+    padding: 20px;
 }
 
 .container {
     max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #1e1e1e;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+    margin: 0 auto;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 20px;
-    font-size: 2.5em;
     color: #00bcd4;
 }
 
 form {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 5px;
     margin-bottom: 20px;
 }
 
 label {
-    font-weight: bold;
+    display: block;
+    margin: 10px 0 5px;
 }
 
-input, select, button {
+input[type="number"],
+input[type="date"],
+input[type="time"],
+select {
     width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border: none;
+    padding: 10px;
+    border: 1px solid #00bcd4;
     border-radius: 5px;
-    font-size: 1em;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-input:focus, select:focus {
-    outline: none;
     background-color: #2a2a2a;
+    color: #fff;
 }
 
 button {
-    background-color: #28a745;
-    color: white;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #00bcd4;
+    color: #fff;
     cursor: pointer;
-    font-weight: bold;
+    margin-top: 10px;
 }
 
 button:hover {
-    background-color: #218838;
-    transform: scale(1.05);
+    background-color: #0097a7;
 }
 
 table {
@@ -68,9 +66,9 @@ table {
 }
 
 th, td {
-    padding: 12px;
-    text-align: center;
+    padding: 10px;
     border: 1px solid #444;
+    text-align: center;
 }
 
 th {
@@ -78,64 +76,18 @@ th {
     color: #00bcd4;
 }
 
-tr:hover {
-    background-color: #333;
-}
-
 .validation-message {
-    color: #ff4757;
-    font-weight: bold;
     margin: 10px 0;
     text-align: center;
+    font-weight: bold;
 }
 
-canvas {
-    margin-top: 20px;
-    max-width: 100%;
-    height: auto; /* Umożliwia odpowiednie skalowanie */
-}
-
-#print-button {
-    background-color: #007bff;
-    margin-top: 20px;
-}
-
-#print-button:hover {
-    background-color: #0056b3;
-}
-
-.action-button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.delete-button {
-    background-color: #ff4757;
-    color: white;
-}
-
-.delete-button:hover {
-    background-color: #c0392b;
-}
-
-/* Responsywność */
 @media (max-width: 600px) {
-    h1 {
-        font-size: 2em; /* Mniejsza czcionka dla nagłówka */
+    form {
+        padding: 15px;
     }
 
-    form, table {
-        padding: 10px; /* Zmniejszenie paddingu w formie i tabeli */
-    }
-
-    input, select, button {
-        font-size: 0.9em; /* Mniejsza czcionka dla inputów */
-    }
-
-    th, td {
-        padding: 8px; /* Mniejsze paddingi dla komórek tabeli */
+    button {
+        padding: 8px;
     }
 }
