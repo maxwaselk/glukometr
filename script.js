@@ -1,5 +1,6 @@
 // Inicjalizacja Chart.js
 let glucoseChart;
+
 function initializeChart() {
     const ctx = document.getElementById('glucose-chart').getContext('2d');
     glucoseChart = new Chart(ctx, {
@@ -56,8 +57,8 @@ function initializeChart() {
 // Funkcja ładowania zapisanych wyników z LocalStorage
 function loadResults() {
     const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
+    console.log("Loaded results:", savedResults);
     savedResults.forEach(result => addResultToTable(result.date, result.time, result.glucose, result.timing, result.notes));
-
     updateChart();
 }
 
@@ -116,6 +117,7 @@ function saveResult(date, time, glucose, timing, notes) {
     const newResult = { date, time, glucose, timing, notes };
     savedResults.push(newResult);
     localStorage.setItem('glucoseResults', JSON.stringify(savedResults));
+    console.log("Saved results:", savedResults);
 }
 
 // Funkcja usuwania wyniku z LocalStorage i tabeli
@@ -127,10 +129,14 @@ function deleteResult(button) {
     const timing = row.children[3].textContent;
     const notes = row.children[4].textContent;
 
+    console.log("Deleting result:", { date, time, glucose, timing, notes });
+
     // Usuwanie z LocalStorage
     let savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
     savedResults = savedResults.filter(result => !(result.date === date && result.time === time && result.glucose == glucose && result.timing === timing && result.notes === notes));
     localStorage.setItem('glucoseResults', JSON.stringify(savedResults));
+
+    console.log("Updated saved results:", savedResults);
 
     // Usuwanie wiersza z tabeli
     row.remove();
@@ -217,6 +223,8 @@ function setupEventListeners() {
         const timing = document.getElementById('glucose-timing').value;
         const notes = document.getElementById('notes').value;
 
+        console.log("Form submitted with:", { date, time, glucose, timing, notes });
+
         // Walidacja formularza
         let isValid = true;
 
@@ -252,7 +260,10 @@ function setupEventListeners() {
             markValid('timing');
         }
 
-        if (!isValid) return;
+        if (!isValid) {
+            console.log("Form validation failed.");
+            return;
+        }
 
         // Dodanie wyniku do tabeli i zapisanie
         addResultToTable(date, time, glucose, timing, notes);
@@ -299,7 +310,7 @@ window.onload = function() {
     loadResults();
     setupEventListeners();
     loadSettings();
-};
+}
 
 // Funkcja przełączająca tryb jasny/ciemny
 function toggleTheme() {
