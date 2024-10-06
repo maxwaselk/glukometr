@@ -1,11 +1,11 @@
 * {
-    box-sizing: border-box; /* Umożliwia lepsze zarządzanie wymiarami elementów */
+    box-sizing: border-box;
 }
 
 body {
-    font-family: 'Roboto', sans-serif; /* Nowoczesna czcionka */
-    background-color: #121212; /* Ciemne tło */
-    color: #ffffff; /* Białe teksty */
+    font-family: 'Roboto', sans-serif;
+    background-color: #121212;
+    color: #ffffff;
     margin: 0;
     padding: 0;
 }
@@ -14,16 +14,16 @@ body {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #1e1e1e; /* Lekko jaśniejszy ciemny kolor tła */
+    background-color: #1e1e1e;
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7); /* Wyraźniejszy cień */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
 }
 
 h1 {
     text-align: center;
     margin-bottom: 20px;
-    font-size: 2.5em; /* Większy nagłówek */
-    color: #00bcd4; /* Kolor akcentu */
+    font-size: 2.5em;
+    color: #00bcd4;
 }
 
 form {
@@ -31,7 +31,7 @@ form {
 }
 
 label {
-    font-weight: bold; /* Pogrubione etykiety */
+    font-weight: bold;
 }
 
 input, select, button {
@@ -40,25 +40,25 @@ input, select, button {
     margin: 10px 0;
     border: none;
     border-radius: 5px;
-    font-size: 1em; /* Umożliwia łatwiejsze czytanie */
-    transition: background-color 0.3s, transform 0.2s; /* Animacje */
+    font-size: 1em;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 input:focus, select:focus {
     outline: none;
-    background-color: #2a2a2a; /* Kolor tła przy focusie */
+    background-color: #2a2a2a;
 }
 
 button {
-    background-color: #28a745; /* Zielony kolor przycisku */
+    background-color: #28a745;
     color: white;
     cursor: pointer;
     font-weight: bold;
 }
 
 button:hover {
-    background-color: #218838; /* Ciemniejszy zielony przy hoverze */
-    transform: scale(1.05); /* Powiększenie przycisku przy hoverze */
+    background-color: #218838;
+    transform: scale(1.05);
 }
 
 table {
@@ -70,40 +70,38 @@ table {
 th, td {
     padding: 12px;
     text-align: center;
-    border: 1px solid #444; /* Kolor obramowania */
+    border: 1px solid #444;
 }
 
 th {
-    background-color: #2a2a2a; /* Ciemniejsze tło nagłówków */
-    color: #00bcd4; /* Kolor tekstu nagłówków */
+    background-color: #2a2a2a;
+    color: #00bcd4;
 }
 
 tr:hover {
-    background-color: #333; /* Zmiana koloru wiersza na hover */
+    background-color: #333;
 }
 
 .validation-message {
-    color: #ff4757; /* Czerwony kolor dla komunikatów o błędach */
+    color: #ff4757;
     font-weight: bold;
     margin: 10px 0;
     text-align: center;
 }
 
 canvas {
-    margin-top: 20px; /* Odstęp nad wykresem */
+    margin-top: 20px;
 }
 
-/* Styl dla przycisku drukowania */
 #print-button {
-    background-color: #007bff; /* Niebieski kolor dla przycisku */
+    background-color: #007bff;
     margin-top: 20px;
 }
 
 #print-button:hover {
-    background-color: #0056b3; /* Ciemniejszy niebieski przy hoverze */
+    background-color: #0056b3;
 }
 
-/* Styl dla akcji w tabeli */
 .action-button {
     padding: 8px 12px;
     border: none;
@@ -113,10 +111,10 @@ canvas {
 }
 
 .delete-button {
-    background-color: #ff4757; /* Czerwony kolor dla przycisku usuwania */
+    background-color: #ff4757;
     color: white;
 }
 
 .delete-button:hover {
-    background-color: #c0392b; /* Ciemniejszy czerwony przy hoverze */
+    background-color: #c0392b;
 }
