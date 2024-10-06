@@ -3,23 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Glukozy</title>
     <link rel="stylesheet" href="styles.css">
-    <title>Pomiar glukozy</title>
+    <!-- Ładowanie biblioteki Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Pomiar glukozy</h1>
+        <h1>Monitor Glukozy</h1>
         <form id="glucose-form">
             <label for="glucose">Poziom glukozy (mg/dL):</label>
             <input type="number" id="glucose" required>
 
             <label for="timing">Kiedy był pomiar:</label>
             <select id="timing" required>
-                <option value="na czczo">Na czczo</option>
+                <option value="">Wybierz moment badania</option>
+                <option value="Na czczo">Na czczo</option>
                 <option value="1 godzina po posiłku">1 godzina po posiłku</option>
                 <option value="2 godziny po posiłku">2 godziny po posiłku</option>
-                <option value="wieczorem">Wieczorem</option>
-                <option value="noc (3-4)">Noc (3-4)</option>
+                <option value="Wieczorem">Wieczorem</option>
+                <option value="Noc (2-3)">Noc (2-3)</option>
             </select>
 
             <label for="date">Data pomiaru:</label>
@@ -48,7 +51,6 @@
         <button id="print-button">Drukuj wyniki z wykresem</button>
         <canvas id="glucose-chart"></canvas>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
