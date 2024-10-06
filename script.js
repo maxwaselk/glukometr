@@ -8,6 +8,10 @@ function initializeChart() {
     const labels = glucoseData.map(item => item.date + ' ' + item.time);
     const data = glucoseData.map(item => item.glucose);
 
+    if (glucoseChart) {
+        glucoseChart.destroy(); // Zniszcz poprzedni wykres
+    }
+
     glucoseChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -54,6 +58,8 @@ document.getElementById('glucose-form').addEventListener('submit', function(even
     
     // Sprawdzenie prawidłowości wyniku
     const validity = checkGlucoseValidity(glucoseInput, timingInput);
+    
+    // Dodaj wynik do tablicy
     glucoseData.push({
         glucose: glucoseInput,
         timing: timingInput,
@@ -71,27 +77,22 @@ document.getElementById('glucose-form').addEventListener('submit', function(even
 // Funkcja sprawdzająca prawidłowość wyniku glukozy
 function checkGlucoseValidity(glucose, timing) {
     glucose = parseFloat(glucose);
-    let isValid = false;
     let message = "Nieprawidłowy";
 
     if (timing === "na czczo" || timing === "wieczorem") {
         if (glucose >= 60 && glucose <= 90) {
-            isValid = true;
             message = "Prawidłowy";
         }
     } else if (timing === "1 godzina po posiłku") {
         if (glucose < 140) {
-            isValid = true;
             message = "Prawidłowy";
         }
     } else if (timing === "2 godziny po posiłku") {
         if (glucose < 120) {
-            isValid = true;
             message = "Prawidłowy";
         }
     } else if (timing === "noc (3-4)") {
         if (glucose >= 60 && glucose <= 90) {
-            isValid = true;
             message = "Prawidłowy";
         }
     }
@@ -126,88 +127,21 @@ function deleteResult(index) {
     initializeChart();
 }
 
-// Funkcja do drukowania wyników z wykresem
-document.getElementById('print-button').addEventListener('click', function () {
-    const printContent = document.querySelector('.container').innerHTML;
-    const newWindow = window.open('', '_blank');
-    newWindow.document.write(`
-        <html>
-            <head>
-                <title>Wyniki pomiarów</title>
-                <style>
-                    body { font-family: 'Roboto', sans-serif; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { padding: 10px; border: 1px solid #444; text-align: center; }
-                    th { background-color: #2a2a2a; color: #00bcd4; }
-                    h1 { text-align: center; color: #00bcd4; }
-                </style>
-            </head>
-            <body>
-                <h1>Wyniki pomiarów</h1>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data i godzina</th>
-                            <th>Poziom glukozy (mg/dL)</th>
-                            <th>Norma</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${glucoseData.map(item => `
-                            <tr>
-                                <td>${item.date} ${item.time}</td>
-                                <td>${item.glucose} mg/dL</td>
-                                <td>${item.validity}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <canvas id="print-chart"></canvas>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script>
-                    const ctx = document.getElementById('print-chart').getContext('2d');
-                    const labels = ${JSON.stringify(glucoseData.map(item => item.date + ' ' + item.time))};
-                    const data = ${JSON.stringify(glucoseData.map(item => item.glucose))};
-
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Poziom glukozy (mg/dL)',
-                                data: data,
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 2,
-                                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                                fill: true,
-                                tension: 0.3
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Data i godzina pomiaru'
-                                    }
-                                },
-                                y: {
-                                    title: {
-                                        display: true,
-                                        text: 'Poziom glukozy (mg/dL)'
-                                    }
-                                }
-                            }
-                        }
-                    });
-                </script>
-            </body>
-        </html>
-    `);
-    newWindow.document.close();
-    newWindow.print();
+// Funkcja drukująca wyniki
+document.getElementById('print-button').addEventListener('click', function() {
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>Drukuj wyniki</title>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<h1>Wyniki pomiarów glukozy</h1>');
+    printWindow.document.write(document.getElementById('results-table').outerHTML);
+    printWindow.document.write('<h2>Wykres poziomu glukozy</h2>');
+    const canvas = document.getElementById('glucose-chart');
+    printWindow.document.write(canvas.outerHTML);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
 });
+
+// Inicjalizacja
 initializeChart();
 updateResultsTable();
