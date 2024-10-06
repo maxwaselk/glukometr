@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 20px auto;
     padding: 20px;
     background-color: #1e1e1e;
@@ -68,6 +68,33 @@ button:hover {
     transform: scale(1.05);
 }
 
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.buttons button {
+    flex: 1 1 48%;
+}
+
+#export-button {
+    background-color: #17a2b8;
+}
+
+#export-button:hover {
+    background-color: #138496;
+}
+
+#print-button {
+    background-color: #007bff;
+}
+
+#print-button:hover {
+    background-color: #0056b3;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -102,24 +129,6 @@ canvas {
     height: auto; /* Umożliwia odpowiednie skalowanie */
 }
 
-#print-button {
-    background-color: #007bff;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    color: #ffffff;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s, transform 0.2s;
-    width: 100%;
-    margin-top: 20px;
-}
-
-#print-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
 .action-button {
     padding: 8px 12px;
     border: none;
@@ -137,6 +146,15 @@ canvas {
     background-color: #c0392b;
 }
 
+.edit-button {
+    background-color: #ffc107;
+    color: #ffffff;
+}
+
+.edit-button:hover {
+    background-color: #e0a800;
+}
+
 /* Responsywność */
 @media (max-width: 600px) {
     h1 {
@@ -147,7 +165,7 @@ canvas {
         padding: 10px;
     }
 
-    button, #print-button {
+    button, #print-button, #export-button {
         padding: 8px;
     }
 
@@ -161,5 +179,13 @@ canvas {
 
     th, td {
         padding: 8px;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+
+    .buttons button {
+        flex: 1 1 100%;
     }
 }
