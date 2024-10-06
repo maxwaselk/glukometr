@@ -6,10 +6,10 @@ function initializeChart() {
     glucoseChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: [], // Daty i czasy pomiarów
+            labels: [],
             datasets: [{
                 label: 'Poziom glukozy (mg/dL)',
-                data: [], // Poziomy glukozy
+                data: [],
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 2,
@@ -170,19 +170,20 @@ function generateTableRows() {
 
 // Obsługa formularza
 document.getElementById('glucose-form').addEventListener('submit', function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Zapobiega przeładowaniu strony
+
     const date = document.getElementById('date').value;
     const time = document.getElementById('time').value;
     const glucose = document.getElementById('glucose').value;
     const timing = document.getElementById('glucose-timing').value;
-    
-    addResultToTable(date, time, glucose, timing);
+
+    addResultToTable(date, time, glucose, timing); // Dodaj wynik
     this.reset(); // Resetuj formularz
 });
 
-// Obsługa przycisku drukowania
-document.getElementById('print-button').addEventListener('click', printResults);
-
-// Ładuj wyniki przy starcie
-loadResults();
-initializeChart();
+// Inicjalizacja wykresu i załaduj wyniki przy starcie
+window.onload = function() {
+    initializeChart();
+    loadResults();
+    document.getElementById('print-button').addEventListener('click', printResults); // Przypisz funkcję do przycisku drukowania
+};
