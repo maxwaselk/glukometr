@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorowanie Glukozy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Monitorowanie poziomu glukozy</h1>
+            <button id="theme-toggle" aria-label="Przełącz tryb jasny/ciemny">🌙</button>
+        </header>
+
+        <div class="card">
+            <form id="glucose-form" novalidate>
+                <div class="form-group">
+                    <label for="date">Data pomiaru:</label>
+                    <input type="date" id="date" required aria-required="true">
+                    <span class="error-message" id="date-error">Proszę wybrać datę.</span>
+                </div>
+                <div class="form-group">
+                    <label for="time">Godzina pomiaru:</label>
+                    <input type="time" id="time" required aria-required="true">
+                    <span class="error-message" id="time-error">Proszę wybrać godzinę.</span>
+                </div>
+                <div class="form-group">
+                    <label for="glucose">Poziom glukozy:</label>
+                    <input type="number" id="glucose" placeholder="Poziom glukozy (mg/dL)" required aria-required="true" min="40" max="400">
+                    <span class="error-message" id="glucose-error">Proszę wprowadzić prawidłowy poziom glukozy.</span>
+                </div>
+                <div class="form-group">
+                    <label for="glucose-timing">Moment badania:</label>
+                    <select id="glucose-timing" required aria-required="true">
+                        <option value="" disabled selected>Wybierz moment badania</option>
+                        <option value="na czczo">Na czczo</option>
+                        <option value="1 godzina po posiłku">1 godzina po posiłku</option>
+                        <option value="2 godziny po posiłku">2 godziny po posiłku</option>
+                        <option value="wieczorem">Wieczorem</option>
+                        <option value="noc (3-4)">Noc (3-4)</option>
+                    </select>
+                    <span class="error-message" id="timing-error">Proszę wybrać moment badania.</span>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notatki:</label>
+                    <textarea id="notes" placeholder="Dodaj notatki (opcjonalnie)" rows="3"></textarea>
+                </div>
+                <button type="submit">Zapisz wynik</button>
+            </form>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="glucose-chart"></canvas>
+        </div>
+
+        <div class="actions">
+            <button onclick="printResults()">Drukuj wyniki</button>
+            <button onclick="exportToCSV()">Eksportuj do CSV</button>
+            <button onclick="downloadData()">Pobierz dane</button>
+        </div>
+
+        <table id="glucose-table">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Czas</th>
+                    <th>Glukoza</th>
+                    <th>Moment</th>
+                    <th>Notatki</th>
+                    <th>Status</th>
+                    <th>Akcja</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Tutaj będą dodawane wyniki pomiarów -->
+            </tbody>
+        </table>
+
+        <!-- Sekcja Ustawień Personalizacji -->
+        <div class="settings-card">
+            <h2>Ustawienia</h2>
+            <div class="form-group">
+                <label for="font-select">Wybierz czcionkę:</label>
+                <select id="font-select">
+                    <option value="Roboto">Roboto</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Tahoma">Tahoma</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="color-picker">Wybierz kolor motywu:</label>
+                <input type="color" id="color-picker" value="#4CAF50">
+            </div>
+            <button onclick="applySettings()">Zastosuj ustawienia</button>
+        </div>
+    </div>
+
+    <!-- Import bibliotek zewnętrznych -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
