@@ -39,7 +39,7 @@ function initializeChart() {
     });
 }
 
-// Funkcja dodawania wyników
+// Funkcja do dodawania wyników
 function addResultToTable(date, time, glucose, timing) {
     const tableBody = document.querySelector('#glucose-table tbody');
     const row = document.createElement('tr');
@@ -128,37 +128,109 @@ function saveResult(date, time, glucose, timing) {
     localStorage.setItem('glucoseResults', JSON.stringify(savedResults));
 }
 
-// Funkcja do ładowania zapisanych wyników
-function loadResults() {
-    const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
-    savedResults.forEach(result => addResultToTable(result.date, result.time, result.glucose, result.timing));
-}
-
 // Funkcja do drukowania wyników
 function printResults() {
     const originalContents = document.body.innerHTML;
 
-    // Ustaw zawartość do druku
-    document.body.innerHTML = originalContents + document.getElementById('glucose-chart').outerHTML;
+    // Ustaw zawartość do wydruku
+    const printContents = `
+        <h1>Wyniki pomiaru glukozy</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Czas</th>
+                    <th>Poziom glukozy (mg/dL)</th>
+                    <th>Moment badania</th>
+                    <th>Ważność</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${generateTableRows()}
+            </tbody>
+        </table>
+        <canvas id="print-chart"></canvas>
+    `;
+    
+    document.body.innerHTML = printContents;
 
+    // Inicjalizuj wykres do wydruku
+    const printChartCtx = document.getElementById('print-chart').getContext('2d');
+    const labels = glucoseChart.data.labels;
+    const data = glucoseChart.data.datasets[0].data;
+
+    const printChart = new Chart(printChartCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Poziom glukozy (mg/dL)',
+                data: data,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'mg/dL'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Data i Czas'
+                    }
+                }
+            }
+        }
+    });
+
+    // Drukowanie
     window.print();
     document.body.innerHTML = originalContents; // Przywróć oryginalną zawartość
 }
 
-// Inicjalizacja aplikacji
-document.addEventListener('DOMContentLoaded', function() {
-    initializeChart();
-    loadResults(); // Ładowanie zapisanych wyników z LocalStorage
-});
+// Funkcja do generowania wierszy tabeli do wydruku
+function generateTableRows() {
+    const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
+    return savedResults.map(result => `
+        <tr>
+            <td>${result.date}</td>
+            <td>${result.time}</td>
+            <td>${result.glucose} mg/dL</td>
+            <td>${result.timing}</td>
+            <td class="${checkGlucoseValidity(result.glucose, result.timing).isValid ? 'good' : 'bad'}">
+                ${checkGlucoseValidity(result.glucose, result.timing).message}
+            </td>
+        </tr>
+    `).join('');
+}
 
-// Dodanie nasłuchiwacza zdarzeń do formularza
+// Inicjalizacja wykresu
+initializeChart();
+
+// Ładowanie zapisanych wyników po załadowaniu strony
+loadResults();
+
+// Obsługa formularza
 document.getElementById('glucose-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Zatrzymaj domyślne działanie formularza
+    event.preventDefault();
     const date = document.getElementById('date').value;
     const time = document.getElementById('time').value;
     const glucose = document.getElementById('glucose').value;
     const timing = document.getElementById('glucose-timing').value;
-
-    addResultToTable(date, time, glucose, timing); // Dodaj wynik do tabeli
-    this.reset(); // Zresetuj formularz
+    addResultToTable(date, time, glucose, timing);
+    this.reset(); // Resetuj formularz po dodaniu
 });
+
+// Obsługa przycisku do drukowania
+document.getElementById('print-button').addEventListener('click', printResults);
