@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitorowanie Glukozy</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Wczytaj bibliotekę Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -45,6 +44,7 @@
 
         <div class="chart-container">
             <canvas id="glucose-chart"></canvas>
+            <button id="print-button">Drukuj Wyniki</button>
         </div>
 
         <table id="glucose-table">
@@ -55,6 +55,7 @@
                     <th>Glukoza</th>
                     <th>Rodzaj pomiaru</th>
                     <th>Status</th>
+                    <th>Akcja</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,7 +64,6 @@
         </table>
     </div>
 
-    <!-- Import skryptu JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
