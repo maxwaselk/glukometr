@@ -106,6 +106,32 @@ function deleteResult(index) {
     }
 }
 
+// Funkcja eksportująca dane do pliku CSV
+function exportToCSV() {
+    if (glucoseData.length === 0) {
+        alert("Brak danych do eksportu!");
+        return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Data i godzina,Poziom glukozy (mg/dL),Moment badania,Norma\n";
+
+    glucoseData.forEach(item => {
+        const row = `${item.date} ${item.time},${item.glucose},${item.timing},${item.validity}`;
+        csvContent += row + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    const currentDate = new Date().toISOString().slice(0,10);
+    link.setAttribute("download", `glucose_data_${currentDate}.csv`);
+    document.body.appendChild(link); // Potrzebne dla Firefox
+
+    link.click();
+    document.body.removeChild(link); // Usuń link po kliknięciu
+}
+
 // Funkcja do drukowania wyników z wykresem
 document.getElementById('print-button').addEventListener('click', function() {
     const printWindow = window.open('', '', 'height=600,width=800');
@@ -128,6 +154,9 @@ document.getElementById('print-button').addEventListener('click', function() {
     printWindow.document.close();
     printWindow.print();
 });
+
+// Obsługa eksportu danych
+document.getElementById('export-button').addEventListener('click', exportToCSV);
 
 // Obsługa formularza
 document.getElementById('glucose-form').addEventListener('submit', function(event) {
