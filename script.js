@@ -142,7 +142,23 @@ document.getElementById('print-button').addEventListener('click', function() {
     printWindow.document.write('<link rel="stylesheet" href="styles.css">');
     printWindow.document.write('</head><body>');
     printWindow.document.write('<h1>Wyniki pomiarów glukozy</h1>');
-    printWindow.document.write(document.getElementById('glucose-table').outerHTML);
+    printWindow.document.write('<table border="1" style="width:100%; border-collapse:collapse;">');
+    printWindow.document.write('<tr><th>Data</th><th>Czas</th><th>Poziom glukozy</th><th>Typ pomiaru</th><th>Ważność</th></tr>');
+
+    glucoseData.forEach(entry => {
+        const glucoseValidity = checkGlucoseValidity(entry.glucose);
+        printWindow.document.write(`
+            <tr>
+                <td>${entry.date}</td>
+                <td>${entry.time}</td>
+                <td>${entry.glucose} mg/dL</td>
+                <td>${entry.measurementType}</td>
+                <td class="${glucoseValidity.isValid ? 'good' : 'bad'}">${glucoseValidity.message}</td>
+            </tr>
+        `);
+    });
+    
+    printWindow.document.write('</table>');
     printWindow.document.write('<h2>Wykres poziomu glukozy</h2>');
     printWindow.document.write('<canvas id="print-chart"></canvas>');
     printWindow.document.write('</body></html>');
