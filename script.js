@@ -122,13 +122,16 @@ function loadResults() {
     savedResults.forEach(result => addResultToTable(result.date, result.time, result.glucose, result.timing));
 }
 
-// Funkcja konfigurująca nasłuchiwanie zdarzeń
-function setupEventListeners() {
-    document.getElementById('glucose-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const date = document.getElementById('date').value;
-        const time = document.getElementById('time').value;
-        const glucose = document.getElementById('glucose').value;
-        const timing = document.getElementById('glucose-timing').value;
-        addResultToTable(date, time, glucose, timing);
-        this.reset(); // Resetuj formularz po
+// Funkcja do drukowania wyników
+function printResults() {
+    const originalContents = document.body.innerHTML;
+
+    // Ustaw zawartość do druku
+    document.body.innerHTML = originalContents + document.getElementById('glucose-chart').outerHTML;
+
+    window.print();
+    document.body.innerHTML = originalContents; // Przywróć oryginalną zawartość
+}
+
+// Inicjalizacja aplikacji
+document.addEventListener('DOMContentLoaded
