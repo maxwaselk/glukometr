@@ -1,5 +1,9 @@
+* {
+    box-sizing: border-box; /* Umożliwia lepsze zarządzanie wymiarami elementów */
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif; /* Nowoczesna czcionka */
     background-color: #121212; /* Ciemne tło */
     color: #ffffff; /* Białe teksty */
     margin: 0;
@@ -12,16 +16,22 @@ body {
     padding: 20px;
     background-color: #1e1e1e; /* Lekko jaśniejszy ciemny kolor tła */
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7); /* Wyraźniejszy cień */
 }
 
 h1 {
     text-align: center;
     margin-bottom: 20px;
+    font-size: 2.5em; /* Większy nagłówek */
+    color: #00bcd4; /* Kolor akcentu */
 }
 
 form {
     margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold; /* Pogrubione etykiety */
 }
 
 input, select, button {
@@ -30,7 +40,8 @@ input, select, button {
     margin: 10px 0;
     border: none;
     border-radius: 5px;
-    transition: background-color 0.3s; /* Animacja zmiany koloru */
+    font-size: 1em; /* Umożliwia łatwiejsze czytanie */
+    transition: background-color 0.3s, transform 0.2s; /* Animacje */
 }
 
 input:focus, select:focus {
@@ -64,6 +75,7 @@ th, td {
 
 th {
     background-color: #2a2a2a; /* Ciemniejsze tło nagłówków */
+    color: #00bcd4; /* Kolor tekstu nagłówków */
 }
 
 tr:hover {
@@ -84,8 +96,27 @@ canvas {
 /* Styl dla przycisku drukowania */
 #print-button {
     background-color: #007bff; /* Niebieski kolor dla przycisku */
+    margin-top: 20px;
 }
 
 #print-button:hover {
     background-color: #0056b3; /* Ciemniejszy niebieski przy hoverze */
+}
+
+/* Styl dla akcji w tabeli */
+.action-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.delete-button {
+    background-color: #ff4757; /* Czerwony kolor dla przycisku usuwania */
+    color: white;
+}
+
+.delete-button:hover {
+    background-color: #c0392b; /* Ciemniejszy czerwony przy hoverze */
 }
