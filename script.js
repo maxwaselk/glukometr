@@ -1,6 +1,6 @@
 let glucoseChart;
 
-// Funkcja do inicjalizacji wykresu
+// Inicjalizacja wykresu
 function initializeChart() {
     const ctx = document.getElementById('glucose-chart').getContext('2d');
     glucoseChart = new Chart(ctx, {
@@ -39,93 +39,50 @@ function initializeChart() {
     });
 }
 
-// Funkcja do dodawania wyników
+// Dodawanie wyniku do tabeli i wykresu
 function addResultToTable(date, time, glucose, timing) {
-    const tableBody = document.querySelector('#glucose-table tbody');
-    const row = document.createElement('tr');
-    const glucoseValidity = checkGlucoseValidity(glucose, timing);
-    
-    row.innerHTML = `
-        <td>${date}</td>
-        <td>${time}</td>
-        <td>${glucose} mg/dL</td>
-        <td>${timing}</td>
-        <td class="${glucoseValidity.isValid ? 'good' : 'bad'}">${glucoseValidity.message}</td>
-        <td><button onclick="deleteResult(this)">Usuń</button></td>
-    `;
-    tableBody.appendChild(row);
-
-    // Dodaj dane do wykresu
-    glucoseChart.data.labels.push(`${date} ${time}`);
-    glucoseChart.data.datasets[0].data.push(glucose);
-    glucoseChart.update();
-
-    // Zapisz wynik w LocalStorage
-    saveResult(date, time, glucose, timing);
-}
-
-// Funkcja do sprawdzania ważności poziomu glukozy
-function checkGlucoseValidity(glucose, timing) {
-    glucose = parseFloat(glucose);
-    let isValid = false;
-    let message = "Nieprawidłowy";
-
-    if (timing === "na czczo" || timing === "wieczorem") {
-        if (glucose >= 70 && glucose <= 90) {
-            isValid = true;
-            message = "Prawidłowy";
-        }
-    } else if (timing === "1 godzina po posiłku") {
-        if (glucose < 140) {
-            isValid = true;
-            message = "Prawidłowy";
-        }
-    } else if (timing === "2 godziny po posiłku") {
-        if (glucose < 120) {
-            isValid = true;
-            message = "Prawidłowy";
-        }
-    } else if (timing === "noc (3-4)") {
-        if (glucose >= 70 && glucose <= 90) {
-            isValid = true;
-            message = "Prawidłowy";
-        }
-    }
-
-    return { isValid, message };
-}
-
-// Funkcja do usuwania wyniku
-function deleteResult(button) {
-    const row = button.parentNode.parentNode;
-    const date = row.children[0].textContent;
-    const time = row.children[1].textContent;
-    row.remove();
-
-    // Zaktualizuj dane wykresu
-    const glucoseIndex = glucoseChart.data.labels.indexOf(`${date} ${time}`);
-    if (glucoseIndex > -1) {
-        glucoseChart.data.labels.splice(glucoseIndex, 1);
-        glucoseChart.data.datasets[0].data.splice(glucoseIndex, 1);
-        glucoseChart.update();
-    }
-
-    // Usunięcie wyniku z LocalStorage
-    removeResultFromLocalStorage(`${date} ${time}`);
-}
-
-// Funkcja do usuwania wyniku z LocalStorage
-function removeResultFromLocalStorage(dateTime) {
-    const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
-    const updatedResults = savedResults.filter(result => !(result.date + ' ' + result.time === dateTime));
-    localStorage.setItem('glucoseResults', JSON.stringify(updatedResults));
-}
-
-// Funkcja do zapisywania wyników
-function saveResult(date, time, glucose, timing) {
     const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
     savedResults.push({ date, time, glucose, timing });
     localStorage.setItem('glucoseResults', JSON.stringify(savedResults));
+    loadResults();
+}
+
+// Ładowanie wyników z LocalStorage
+function loadResults() {
+    const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
+    const resultsTableBody = document.querySelector('#results-table tbody');
+    resultsTableBody.innerHTML = '';
+
+    glucoseChart.data.labels = [];
+    glucoseChart.data.datasets[0].data = [];
+
+    savedResults.forEach((result, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${result.date}</td>
+            <td>${result.time}</td>
+            <td>${result.glucose}</td>
+            <td>${result.timing}</td>
+            <td>
+                <button onclick="deleteResult(${index})">Usuń</button>
+            </td>
+        `;
+        resultsTableBody.appendChild(row);
+
+        // Dodaj dane do wykresu
+        glucoseChart.data.labels.push(`${result.date} ${result.time}`);
+        glucoseChart.data.datasets[0].data.push(result.glucose);
+    });
+
+    glucoseChart.update(); // Zaktualizuj wykres
+}
+
+// Usuwanie wyniku
+function deleteResult(index) {
+    const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
+    savedResults.splice(index, 1); // Usuń element
+    localStorage.setItem('glucoseResults', JSON.stringify(savedResults));
+    loadResults(); // Załaduj wyniki ponownie
 }
 
 // Funkcja do drukowania wyników
@@ -142,7 +99,6 @@ function printResults() {
                     <th>Czas</th>
                     <th>Poziom glukozy (mg/dL)</th>
                     <th>Moment badania</th>
-                    <th>Ważność</th>
                 </tr>
             </thead>
             <tbody>
@@ -199,27 +155,18 @@ function printResults() {
     document.body.innerHTML = originalContents; // Przywróć oryginalną zawartość
 }
 
-// Funkcja do generowania wierszy tabeli do wydruku
+// Funkcja generująca wiersze tabeli do druku
 function generateTableRows() {
     const savedResults = JSON.parse(localStorage.getItem('glucoseResults')) || [];
     return savedResults.map(result => `
         <tr>
             <td>${result.date}</td>
             <td>${result.time}</td>
-            <td>${result.glucose} mg/dL</td>
+            <td>${result.glucose}</td>
             <td>${result.timing}</td>
-            <td class="${checkGlucoseValidity(result.glucose, result.timing).isValid ? 'good' : 'bad'}">
-                ${checkGlucoseValidity(result.glucose, result.timing).message}
-            </td>
         </tr>
     `).join('');
 }
-
-// Inicjalizacja wykresu
-initializeChart();
-
-// Ładowanie zapisanych wyników po załadowaniu strony
-loadResults();
 
 // Obsługa formularza
 document.getElementById('glucose-form').addEventListener('submit', function(event) {
@@ -228,9 +175,14 @@ document.getElementById('glucose-form').addEventListener('submit', function(even
     const time = document.getElementById('time').value;
     const glucose = document.getElementById('glucose').value;
     const timing = document.getElementById('glucose-timing').value;
+    
     addResultToTable(date, time, glucose, timing);
-    this.reset(); // Resetuj formularz po dodaniu
+    this.reset(); // Resetuj formularz
 });
 
-// Obsługa przycisku do drukowania
+// Obsługa przycisku drukowania
 document.getElementById('print-button').addEventListener('click', printResults);
+
+// Ładuj wyniki przy starcie
+loadResults();
+initializeChart();
