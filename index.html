@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Glukozy</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Pomiar glukozy</title>
 </head>
 <body>
     <div class="container">
-        <h1>Monitor Glukozy</h1>
+        <h1>Pomiar glukozy</h1>
         <form id="glucose-form">
-            <label for="glucose-level">Poziom glukozy (mg/dL):</label>
-            <input type="number" id="glucose-level" required>
-            
+            <label for="glucose">Poziom glukozy (mg/dL):</label>
+            <input type="number" id="glucose" required>
+
             <label for="timing">Kiedy był pomiar:</label>
             <select id="timing" required>
                 <option value="na czczo">Na czczo</option>
@@ -22,31 +21,34 @@
                 <option value="wieczorem">Wieczorem</option>
                 <option value="noc (3-4)">Noc (3-4)</option>
             </select>
-            
-            <label for="measurement-date">Data pomiaru:</label>
-            <input type="datetime-local" id="measurement-date" required>
-            
+
+            <label for="date">Data pomiaru:</label>
+            <input type="date" id="date" required>
+
+            <label for="time">Godzina pomiaru:</label>
+            <input type="time" id="time" required>
+
             <button type="submit">Dodaj wynik</button>
-            <div class="validation-message" id="validation-message"></div>
         </form>
+
+        <div class="validation-message" id="validation-message"></div>
 
         <table id="results-table">
             <thead>
                 <tr>
-                    <th>Poziom glukozy</th>
-                    <th>Czas pomiaru</th>
-                    <th>Prawidłowość</th>
+                    <th>Data i godzina</th>
+                    <th>Poziom glukozy (mg/dL)</th>
+                    <th>Norma</th>
                     <th>Akcje</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-        
-        <canvas id="glucose-chart"></canvas>
-        
+
         <button id="print-button">Drukuj wyniki z wykresem</button>
+        <canvas id="glucose-chart"></canvas>
     </div>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
