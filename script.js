@@ -1,11 +1,12 @@
 // script.js
 
-// Inicjalizacja wykresu Chart.js
+// Inicjalizacja wykresów Chart.js
 let glucoseChart;
+let averageGlucoseChart;
 let glucoseData = JSON.parse(localStorage.getItem('glucoseData')) || [];
 
-// Funkcja inicjalizująca wykres
-function initializeChart() {
+// Funkcja inicjalizująca główny wykres glukozy
+function initializeGlucoseChart() {
     const ctx = document.getElementById('glucose-chart').getContext('2d');
     const labels = glucoseData.map(item => `${item.date} ${item.time}`);
     const data = glucoseData.map(item => parseFloat(item.glucose));
@@ -48,6 +49,81 @@ function initializeChart() {
             }
         }
     });
+}
+
+// Funkcja inicjalizująca wykres średniego poziomu glukozy
+function initializeAverageGlucoseChart() {
+    const ctx = document.getElementById('average-glucose-chart').getContext('2d');
+
+    // Grupowanie danych po dacie
+    const averages = {};
+    glucoseData.forEach(item => {
+        if (!averages[item.date]) {
+            averages[item.date] = [];
+        }
+        averages[item.date].push(parseFloat(item.glucose));
+    });
+
+    const labels = Object.keys(averages);
+    const averageData = labels.map(date => {
+        const sum = averages[date].reduce((a, b) => a + b, 0);
+        return (sum / averages[date].length).toFixed(2);
+    });
+
+    if (averageGlucoseChart) {
+        averageGlucoseChart.destroy(); // Zniszcz poprzedni wykres, jeśli istnieje
+    }
+
+    averageGlucoseChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Średni poziom glukozy (mg/dL)',
+                data: averageData,
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Data pomiarów'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Średni poziom glukozy (mg/dL)'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Funkcja aktualizująca statystyki
+function updateStatistics() {
+    if (glucoseData.length === 0) {
+        document.getElementById('average-glucose').textContent = "Średni poziom glukozy: -- mg/dL";
+        document.getElementById('min-glucose').textContent = "Minimalny poziom glukozy: -- mg/dL";
+        document.getElementById('max-glucose').textContent = "Maksymalny poziom glukozy: -- mg/dL";
+        return;
+    }
+
+    const glucoseLevels = glucoseData.map(item => parseFloat(item.glucose));
+    const average = (glucoseLevels.reduce((a, b) => a + b, 0) / glucoseLevels.length).toFixed(2);
+    const min = Math.min(...glucoseLevels).toFixed(2);
+    const max = Math.max(...glucoseLevels).toFixed(2);
+
+    document.getElementById('average-glucose').textContent = `Średni poziom glukozy: ${average} mg/dL`;
+    document.getElementById('min-glucose').textContent = `Minimalny poziom glukozy: ${min} mg/dL`;
+    document.getElementById('max-glucose').textContent = `Maksymalny poziom glukozy: ${max} mg/dL`;
 }
 
 // Funkcja sprawdzająca prawidłowość wyniku glukozy
@@ -94,6 +170,11 @@ function updateResultsTable() {
         `;
         tableBody.appendChild(row);
     });
+
+    // Aktualizuj statystyki i wykresy
+    updateStatistics();
+    initializeGlucoseChart();
+    initializeAverageGlucoseChart();
 }
 
 // Funkcja usuwająca wynik
@@ -102,7 +183,6 @@ function deleteResult(index) {
         glucoseData.splice(index, 1);
         localStorage.setItem('glucoseData', JSON.stringify(glucoseData));
         updateResultsTable();
-        initializeChart();
     }
 }
 
@@ -113,23 +193,30 @@ function exportToCSV() {
         return;
     }
 
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Data i godzina,Poziom glukozy (mg/dL),Moment badania,Norma\n";
+    const headers = ["Data i godzina", "Poziom glukozy (mg/dL)", "Moment badania", "Norma"];
+    const rows = glucoseData.map(item => [
+        `${item.date} ${item.time}`,
+        item.glucose,
+        item.timing,
+        item.validity
+    ]);
 
-    glucoseData.forEach(item => {
-        const row = `${item.date} ${item.time},${item.glucose},${item.timing},${item.validity}`;
+    let csvContent = headers.join(",") + "\n";
+    rows.forEach(rowArray => {
+        let row = rowArray.map(field => `"${field}"`).join(",");
         csvContent += row + "\n";
     });
 
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
     const currentDate = new Date().toISOString().slice(0,10);
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
     link.setAttribute("download", `glucose_data_${currentDate}.csv`);
-    document.body.appendChild(link); // Potrzebne dla Firefox
-
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link); // Usuń link po kliknięciu
+    document.body.removeChild(link);
 }
 
 // Funkcja do drukowania wyników z wykresem
@@ -149,13 +236,13 @@ document.getElementById('print-button').addEventListener('click', function() {
     printWindow.document.write('<h2>Wykres poziomu glukozy</h2>');
     const canvas = document.getElementById('glucose-chart');
     const chartImage = canvas.toDataURL('image/png');
-    printWindow.document.write(`<img src="${chartImage}" alt="Wykres poziomu glukozy">`);
+    printWindow.document.write(`<img src="${chartImage}" alt="Wykres poziomu glukozy" style="max-width:100%;">`);
     printWindow.document.write('</body></html>');
     printWindow.document.close();
     printWindow.print();
 });
 
-// Obsługa eksportu danych
+// Funkcja eksportująca dane do pliku CSV
 document.getElementById('export-button').addEventListener('click', exportToCSV);
 
 // Obsługa formularza
@@ -189,9 +276,8 @@ document.getElementById('glucose-form').addEventListener('submit', function(even
     // Zapisz do localStorage
     localStorage.setItem('glucoseData', JSON.stringify(glucoseData));
 
-    // Aktualizuj tabelę i wykres
+    // Aktualizuj tabelę i wykresy
     updateResultsTable();
-    initializeChart();
 
     // Resetuj formularz
     this.reset();
@@ -201,7 +287,6 @@ document.getElementById('glucose-form').addEventListener('submit', function(even
 function loadFromLocalStorage() {
     glucoseData = JSON.parse(localStorage.getItem('glucoseData')) || [];
     updateResultsTable();
-    initializeChart();
 }
 
 // Inicjalizacja po załadowaniu strony
