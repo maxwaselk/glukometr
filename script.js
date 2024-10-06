@@ -1,17 +1,20 @@
 // Inicjalizacja wykresu Chart.js
 let glucoseChart;
-let glucoseData = [];
-let labels = [];
+let glucoseData = JSON.parse(localStorage.getItem('glucoseData')) || [];
 
+// Funkcja inicjalizująca wykres
 function initializeChart() {
     const ctx = document.getElementById('glucose-chart').getContext('2d');
+    const labels = glucoseData.map(item => item.date + ' ' + item.time);
+    const data = glucoseData.map(item => item.glucose);
+
     glucoseChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
                 label: 'Poziom glukozy (mg/dL)',
-                data: glucoseData.map(data => data.glucose),
+                data: data,
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 2,
@@ -23,17 +26,16 @@ function initializeChart() {
         options: {
             responsive: true,
             scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Poziom glukozy (mg/dL)'
-                    }
-                },
                 x: {
                     title: {
                         display: true,
-                        text: 'Czas'
+                        text: 'Data i godzina pomiaru'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Poziom glukozy (mg/dL)'
                     }
                 }
             }
@@ -41,57 +43,30 @@ function initializeChart() {
     });
 }
 
-function addResultToTable(glucose, timing, validity, date) {
-    const tableBody = document.querySelector('#results-table tbody');
-    const row = document.createElement('tr');
-
-    row.innerHTML = `
-        <td>${glucose}</td>
-        <td>${date} (${timing})</td>
-        <td>${validity}</td>
-        <td><button class="action-button delete-button">Usuń</button></td>
-    `;
-
-    row.querySelector('.delete-button').addEventListener('click', function () {
-        tableBody.removeChild(row);
-        removeResult(glucose, timing, date);
-        updateChart();
+// Funkcja dodająca wynik
+document.getElementById('glucose-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const glucoseInput = document.getElementById('glucose').value;
+    const timingInput = document.getElementById('timing').value;
+    const dateInput = document.getElementById('date').value;
+    const timeInput = document.getElementById('time').value;
+    
+    // Sprawdzenie prawidłowości wyniku
+    const validity = checkGlucoseValidity(glucoseInput, timingInput);
+    glucoseData.push({
+        glucose: glucoseInput,
+        timing: timingInput,
+        date: dateInput,
+        time: timeInput,
+        validity: validity
     });
-
-    tableBody.appendChild(row);
-}
-
-function removeResult(glucose, timing, date) {
-    const index = glucoseData.findIndex(data => data.glucose === glucose && data.timing === timing && data.date === date);
-    if (index !== -1) {
-        glucoseData.splice(index, 1);
-        labels.splice(index, 1);
-        saveToLocalStorage();
-        updateChart();
-    }
-}
-
-function updateChart() {
-    glucoseChart.data.labels = labels;
-    glucoseChart.data.datasets[0].data = glucoseData.map(data => data.glucose);
-    glucoseChart.update();
-}
-
-function saveToLocalStorage() {
+    
     localStorage.setItem('glucoseData', JSON.stringify(glucoseData));
-}
-
-function loadFromLocalStorage() {
-    const storedData = JSON.parse(localStorage.getItem('glucoseData'));
-    if (storedData) {
-        glucoseData = storedData;
-        glucoseData.forEach(data => {
-            addResultToTable(data.glucose, data.timing, data.validity, data.date);
-            labels.push(new Date(data.date).toLocaleString()); // Dodaj daty do etykiet
-        });
-        updateChart();
-    }
-}
+    updateResultsTable();
+    initializeChart();
+    this.reset(); // Resetowanie formularza
+});
 
 // Funkcja sprawdzająca prawidłowość wyniku glukozy
 function checkGlucoseValidity(glucose, timing) {
@@ -99,7 +74,7 @@ function checkGlucoseValidity(glucose, timing) {
     let isValid = false;
     let message = "Nieprawidłowy";
 
-    if (timing === "na czczo") {
+    if (timing === "na czczo" || timing === "wieczorem") {
         if (glucose >= 60 && glucose <= 90) {
             isValid = true;
             message = "Prawidłowy";
@@ -114,13 +89,8 @@ function checkGlucoseValidity(glucose, timing) {
             isValid = true;
             message = "Prawidłowy";
         }
-    } else if (timing === "wieczorem") {
-        if (glucose >= 60 && glucose <= 105) {
-            isValid = true;
-            message = "Prawidłowy";
-        }
     } else if (timing === "noc (3-4)") {
-        if (glucose > 60) {
+        if (glucose >= 60 && glucose <= 90) {
             isValid = true;
             message = "Prawidłowy";
         }
@@ -129,63 +99,115 @@ function checkGlucoseValidity(glucose, timing) {
     return message;
 }
 
-// Dodawanie wyników
-document.getElementById('glucose-form').addEventListener('submit', function (event) {
-    event.preventDefault();
+// Funkcja aktualizująca tabelę wyników
+function updateResultsTable() {
+    const resultsTableBody = document.getElementById('results-table').querySelector('tbody');
+    resultsTableBody.innerHTML = ''; // Czyść poprzednie dane
 
-    const glucoseLevel = document.getElementById('glucose-level').value;
-    const timing = document.getElementById('timing').value;
-    const date = document.getElementById('measurement-date').value;
-
-    const validity = checkGlucoseValidity(glucoseLevel, timing);
-    addResultToTable(glucoseLevel, timing, validity, date);
-
-    glucoseData.push({
-        glucose: parseFloat(glucoseLevel),
-        timing: timing,
-        validity: validity,
-        date: date
+    glucoseData.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.date} ${item.time}</td>
+            <td>${item.glucose} mg/dL</td>
+            <td>${item.validity}</td>
+            <td>
+                <button class="delete-button" onclick="deleteResult(${index})">Usuń</button>
+            </td>
+        `;
+        resultsTableBody.appendChild(row);
     });
-    labels.push(date);
-    saveToLocalStorage();
-    updateChart();
+}
 
-    document.getElementById('glucose-level').value = ''; // Resetowanie pola
-    document.getElementById('measurement-date').value = ''; // Resetowanie pola
-    document.getElementById('validation-message').textContent = ''; // Resetowanie komunikatu
-});
+// Funkcja usuwająca wynik
+function deleteResult(index) {
+    glucoseData.splice(index, 1);
+    localStorage.setItem('glucoseData', JSON.stringify(glucoseData));
+    updateResultsTable();
+    initializeChart();
+}
 
-// Funkcja drukująca wyniki
+// Funkcja do drukowania wyników z wykresem
 document.getElementById('print-button').addEventListener('click', function () {
-    const printWindow = window.open('', '_blank');
-    const tableHTML = document.querySelector('#results-table').outerHTML;
-    const chartCanvas = document.getElementById('glucose-chart');
-    const chartImage = chartCanvas.toDataURL('image/png');
-
-    printWindow.document.write(`
+    const printContent = document.querySelector('.container').innerHTML;
+    const newWindow = window.open('', '_blank');
+    newWindow.document.write(`
         <html>
             <head>
-                <title>Drukowanie wyników</title>
+                <title>Wyniki pomiarów</title>
                 <style>
-                    body { font-family: Arial, sans-serif; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { padding: 12px; border: 1px solid #444; }
-                    th { background-color: #f2f2f2; }
-                    img { max-width: 100%; }
+                    body { font-family: 'Roboto', sans-serif; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { padding: 10px; border: 1px solid #444; text-align: center; }
+                    th { background-color: #2a2a2a; color: #00bcd4; }
+                    h1 { text-align: center; color: #00bcd4; }
                 </style>
             </head>
             <body>
-                <h1>Wyniki pomiarów glukozy</h1>
-                ${tableHTML}
-                <h2>Wykres poziomu glukozy</h2>
-                <img src="${chartImage}" alt="Wykres poziomu glukozy">
+                <h1>Wyniki pomiarów</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data i godzina</th>
+                            <th>Poziom glukozy (mg/dL)</th>
+                            <th>Norma</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${glucoseData.map(item => `
+                            <tr>
+                                <td>${item.date} ${item.time}</td>
+                                <td>${item.glucose} mg/dL</td>
+                                <td>${item.validity}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <canvas id="print-chart"></canvas>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                    const ctx = document.getElementById('print-chart').getContext('2d');
+                    const labels = ${JSON.stringify(glucoseData.map(item => item.date + ' ' + item.time))};
+                    const data = ${JSON.stringify(glucoseData.map(item => item.glucose))};
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Poziom glukozy (mg/dL)',
+                                data: data,
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                                fill: true,
+                                tension: 0.3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Data i godzina pomiaru'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Poziom glukozy (mg/dL)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                </script>
             </body>
         </html>
     `);
-    printWindow.document.close();
-    printWindow.print();
+    newWindow.document.close();
+    newWindow.print();
 });
-
-// Ładowanie danych z LocalStorage po załadowaniu strony
-window.onload = loadFromLocalStorage;
 initializeChart();
+updateResultsTable();
