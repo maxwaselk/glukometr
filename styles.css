@@ -91,6 +91,8 @@ tr:hover {
 
 canvas {
     margin-top: 20px;
+    max-width: 100%;
+    height: auto; /* Umożliwia odpowiednie skalowanie */
 }
 
 #print-button {
@@ -117,4 +119,23 @@ canvas {
 
 .delete-button:hover {
     background-color: #c0392b;
+}
+
+/* Responsywność */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2em; /* Mniejsza czcionka dla nagłówka */
+    }
+
+    form, table {
+        padding: 10px; /* Zmniejszenie paddingu w formie i tabeli */
+    }
+
+    input, select, button {
+        font-size: 0.9em; /* Mniejsza czcionka dla inputów */
+    }
+
+    th, td {
+        padding: 8px; /* Mniejsze paddingi dla komórek tabeli */
+    }
 }
