@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitorowanie Glukozy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="styles.css">
+    <!-- Wczytaj bibliotekę Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Monitorowanie poziomu glukozy</h1>
-            <button id="theme-toggle" aria-label="Przełącz tryb jasny/ciemny">🌙</button>
         </header>
 
         <div class="card">
@@ -20,17 +19,25 @@
                 <div class="form-group">
                     <label for="date">Data pomiaru:</label>
                     <input type="date" id="date" required aria-required="true">
-                    <span class="error-message" id="date-error">Proszę wybrać datę.</span>
                 </div>
                 <div class="form-group">
                     <label for="time">Godzina pomiaru:</label>
                     <input type="time" id="time" required aria-required="true">
-                    <span class="error-message" id="time-error">Proszę wybrać godzinę.</span>
                 </div>
                 <div class="form-group">
                     <label for="glucose">Poziom glukozy:</label>
                     <input type="number" id="glucose" placeholder="Poziom glukozy (mg/dL)" required aria-required="true" min="40" max="400">
-                    <span class="error-message" id="glucose-error">Proszę wprowadzić prawidłowy poziom glukozy.</span>
+                </div>
+                <div class="form-group">
+                    <label for="measurement-type">Rodzaj pomiaru:</label>
+                    <select id="measurement-type" required>
+                        <option value="" disabled selected>Wybierz rodzaj pomiaru</option>
+                        <option value="na czczo">Na czczo</option>
+                        <option value="1 godzina po posiłku">1 godzina po posiłku</option>
+                        <option value="2 godziny po posiłku">2 godziny po posiłku</option>
+                        <option value="wieczorem">Wieczorem</option>
+                        <option value="w nocy">W nocy</option>
+                    </select>
                 </div>
                 <button type="submit">Zapisz wynik</button>
             </form>
@@ -40,31 +47,23 @@
             <canvas id="glucose-chart"></canvas>
         </div>
 
-        <div class="actions">
-            <button onclick="printResults()">Drukuj wyniki</button>
-            <button onclick="exportToCSV()">Eksportuj do CSV</button>
-            <button onclick="downloadData()">Pobierz dane</button>
-        </div>
-
         <table id="glucose-table">
             <thead>
                 <tr>
                     <th>Data</th>
                     <th>Czas</th>
                     <th>Glukoza</th>
+                    <th>Rodzaj pomiaru</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Tutaj będą dodawane wyniki pomiarów -->
+                <!-- Wyniki pomiarów będą dodawane tutaj -->
             </tbody>
         </table>
     </div>
 
-    <!-- Import bibliotek zewnętrznych -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-dayjs@1/chartjs-adapter-dayjs.min.js"></script>
+    <!-- Import skryptu JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
