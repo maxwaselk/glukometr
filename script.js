@@ -264,14 +264,7 @@ document.getElementById('glucose-form').addEventListener('submit', function(even
     // Sprawdzenie prawidłowości wyniku
     const validity = checkGlucoseValidity(glucose, timing);
 
-    if (validity !== "Prawidłowy") {
-        document.getElementById('validation-message').textContent = `Nieprawidłowy wynik glukozy dla "${timing}". Proszę sprawdzić normy.`;
-        return;
-    } else {
-        document.getElementById('validation-message').textContent = '';
-    }
-
-    // Dodaj wynik do tablicy danych
+    // Dodaj wynik do tablicy danych (niezależnie od prawidłowości)
     glucoseData.push({
         glucose: parseFloat(glucose),
         timing: timing,
@@ -288,6 +281,9 @@ document.getElementById('glucose-form').addEventListener('submit', function(even
 
     // Resetuj formularz
     this.reset();
+
+    // Wyczyść komunikat walidacji
+    document.getElementById('validation-message').textContent = '';
 });
 
 // Funkcja ładowania danych z localStorage
